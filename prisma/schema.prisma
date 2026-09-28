@@ -1,0 +1,221 @@
+// SportShop CRM — PostgreSQL schema
+// Uses Neon PostgreSQL via DATABASE_URL environment variable.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Store {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  logo        String?
+  description String?
+  phone       String?
+  email       String?
+  address     String?
+  city        String?
+  currency    String   @default("USD")
+  taxRate     Float    @default(0) // Percentage
+  lowStockThreshold Int  @default(5)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  users       User[]
+  categories  Category[]
+  products    Product[]
+  customers   Customer[]
+  orders      Order[]
+  suppliers   Supplier[]
+  inventoryMovements InventoryMovement[]
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  name         String
+  role         String   @default("STAFF") // ADMIN | STAFF
+  active       Boolean  @default(true)
+  storeId      String
+  store        Store    @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Category {
+  id          String   @id @default(cuid())
+  storeId     String
+  store       Store    @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  name        String
+  description String?
+  imageUrl    String?
+  active      Boolean  @default(true)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  products    Product[]
+
+  @@index([storeId])
+  @@index([storeId, name])
+}
+
+model Supplier {
+  id          String   @id @default(cuid())
+  storeId     String
+  store       Store    @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  name        String
+  company     String?
+  phone       String?
+  email       String?
+  address     String?
+  notes       String?
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  products    ProductSupplier[]
+
+  @@index([storeId])
+  @@index([storeId, name])
+}
+
+model Product {
+  id              String   @id @default(cuid())
+  storeId         String
+  store           Store    @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  categoryId      String
+  category        Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  name            String
+  sku             String
+  barcode         String?
+  brand           String?
+  description     String?
+  imageUrl        String?
+  purchasePrice   Float    @default(0)
+  sellingPrice    Float
+  quantity        Int      @default(0)
+  minStockLevel   Int      @default(5)
+  active          Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  orderItems      OrderItem[]
+  suppliers       ProductSupplier[]
+  inventoryMovements InventoryMovement[]
+
+  @@unique([storeId, sku])
+  @@index([storeId, categoryId])
+  @@index([storeId, name])
+  @@index([storeId, barcode])
+  @@index([storeId, active])
+}
+
+model ProductSupplier {
+  id          String   @id @default(cuid())
+  productId   String
+  product     Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  supplierId  String
+  supplier    Supplier @relation(fields: [supplierId], references: [id], onDelete: Cascade)
+  costPrice   Float?
+  createdAt   DateTime @default(now())
+
+  @@unique([productId, supplierId])
+  @@index([supplierId])
+}
+
+model Customer {
+  id           String   @id @default(cuid())
+  storeId      String
+  store        Store    @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  name         String
+  phone        String?
+  email        String?
+  address      String?
+  city         String?
+  notes        String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  orders       Order[]
+
+  @@index([storeId])
+  @@index([storeId, name])
+  @@index([storeId, phone])
+  @@index([storeId, email])
+}
+
+model Order {
+  id            String   @id @default(cuid())
+  storeId       String
+  store         Store    @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  orderNumber   String
+  customerId    String?
+  customer      Customer? @relation(fields: [customerId], references: [id], onDelete: SetNull)
+  customerName  String?
+  customerPhone String?
+  customerEmail String?
+  // PENDING | PROCESSING | COMPLETED | CANCELLED | RETURNED
+  status        String   @default("PENDING")
+  // PENDING | PAID | PARTIALLY_PAID | REFUNDED
+  paymentStatus String   @default("PENDING")
+  // CASH | CARD | BANK_TRANSFER | ONLINE
+  paymentMethod String?
+  subtotal      Float    @default(0)
+  discount      Float    @default(0)
+  tax           Float    @default(0)
+  total         Float    @default(0)
+  notes         String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  items         OrderItem[]
+
+  @@unique([storeId, orderNumber])
+  @@index([storeId, status])
+  @@index([storeId, createdAt])
+  @@index([storeId, customerId])
+  @@index([storeId, paymentStatus])
+}
+
+model OrderItem {
+  id         String  @id @default(cuid())
+  orderId    String
+  order      Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId  String?
+  product    Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
+  // Snapshot at order time
+  productName String
+  quantity    Int
+  unitPrice   Float
+  subtotal    Float
+
+  @@index([orderId])
+  @@index([productId])
+}
+
+model InventoryMovement {
+  id          String   @id @default(cuid())
+  storeId     String
+  store       Store    @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  productId   String
+  product     Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  // STOCK_IN | STOCK_OUT | ADJUSTMENT | ORDER | RETURN | CANCEL
+  type        String
+  quantity    Int
+  previousQty Int
+  newQty      Int
+  reference   String?
+  notes       String?
+  createdAt   DateTime @default(now())
+
+  @@index([storeId, productId])
+  @@index([storeId, createdAt])
+  @@index([productId, createdAt])
+}

@@ -1,0 +1,207 @@
+@import "tailwindcss";
+
+:root {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+}
+
+/* SportShop CRM — Red, black, and white brand palette */
+:root,
+[data-theme="light"] {
+  --bg: #080B0F;
+  --bg-elevated: #0B0F14;
+  --bg-card: #151A20;
+  --bg-soft: #1B2129;
+  --bg-sidebar: #0B0F14;
+  --border: #2A313A;
+  --border-strong: #3A424C;
+  --primary: #EF1F2F;
+  --primary-bright: #FF3B4B;
+  --primary-dim: #B81525;
+  --text: #F5F7FA;
+  --text-muted: #A7B0BC;
+  --text-dim: #737D89;
+  --danger: #ef4444;
+  --success: #22c55e;
+  --warning: #f97316;
+  --info: #3b82f6;
+  --shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+[data-theme="dark"] {
+  --bg: #080B0F;
+  --bg-elevated: #0B0F14;
+  --bg-card: #151A20;
+  --bg-soft: #1B2129;
+  --bg-sidebar: #0B0F14;
+  --border: #2A313A;
+  --border-strong: #3A424C;
+  --primary: #EF1F2F;
+  --primary-bright: #FF3B4B;
+  --primary-dim: #B81525;
+  --text: #F5F7FA;
+  --text-muted: #A7B0BC;
+  --text-dim: #737D89;
+  --danger: #ef4444;
+  --success: #22c55e;
+  --warning: #f97316;
+  --info: #3b82f6;
+  --shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+@theme inline {
+  --color-background: var(--bg);
+  --color-foreground: var(--text);
+  --color-primary: var(--primary);
+  --color-primary-bright: var(--primary-bright);
+  --font-sans: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+  min-height: 100%;
+}
+
+h1,
+h2,
+h3 {
+  font-weight: 700;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-elevated);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--primary-dim);
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateX(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.animate-fade-up {
+  animation: fade-up 0.45s ease-out both;
+}
+
+.surface {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  color: var(--text);
+}
+
+.surface-elevated {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  color: var(--text);
+}
+
+.input-theme {
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
+  color: var(--text);
+}
+
+.input-theme::placeholder {
+  color: var(--text-dim);
+}
+
+.input-theme:focus {
+  border-color: var(--primary);
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(239, 31, 47, 0.15);
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: #fff;
+  font-weight: 600;
+  border-radius: 0.75rem;
+  padding: 0.625rem 1.25rem;
+  transition: all 0.15s ease;
+}
+
+.btn-primary:hover {
+  background: var(--primary-bright);
+}
+
+.btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-secondary {
+  background: var(--bg-soft);
+  color: var(--text);
+  font-weight: 500;
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  padding: 0.625rem 1.25rem;
+  transition: all 0.15s ease;
+}
+
+.btn-secondary:hover {
+  border-color: var(--primary);
+  color: var(--primary-bright);
+}
+
+.btn-danger {
+  background: var(--danger);
+  color: #fff;
+  font-weight: 600;
+  border-radius: 0.75rem;
+  padding: 0.625rem 1.25rem;
+  transition: all 0.15s ease;
+}
+
+.btn-danger:hover {
+  opacity: 0.9;
+}
+
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 1rem;
+  padding: 1.25rem;
+}
+
+.card-elevated {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 1rem;
+  padding: 1.25rem;
+}
